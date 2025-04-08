@@ -2,9 +2,10 @@ name: Hourly Script Execution
 
 on:
   schedule:
-    # Run every hour from 8:00 UTC to 0:00 UTC (16:00-08:00 Beijing time)
-    - cron: '0 8-23 * * *' # 8:00-23:00 UTC
-    - cron: '0 0 * * *'    # 0:00 UTC (next day)
+    # Run every hour during US market hours (including pre-market and after-hours)
+    # US market total hours: 4:00 AM - 8:00 PM ET
+    # Converting to UTC (covering both standard and daylight saving time periods)
+    - cron: "0 16-23 * * 1-5"
   push:
     branches:
       - master
@@ -15,17 +16,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.11.11'
-          
+          python-version: "3.11.11"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/
           if [ -f requirements.txt ]; then pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/; fi
-          
+
       - name: Run script
         run: python main.py
         env:
@@ -34,4 +35,4 @@ jobs:
           TARGET_STOCK: ${{ secrets.TARGET_STOCK }}
           TRADE_QUANTITY: ${{ secrets.TRADE_QUANTITY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          # Add any other environment variables your script needs 
+          # Add any other environment variables your script needs
