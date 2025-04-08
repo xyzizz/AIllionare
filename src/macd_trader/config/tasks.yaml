@@ -52,6 +52,7 @@ generate_advice_task:
     接收关于{stock_ticker}的MACD分析结果（BUY、SELL或HOLD信号）。
     标题为：{stock_ticker} [买入/卖出/持有], 例如："AAPL [买入]"。
     内容为：
+      0. 当前的股价、MACD值和信号线值
       1. 当前的市场信号解释（为什么是买入/卖出/持有）
       2. 具体的操作建议（例如："建议以当前价格买入{quantity}股"）
       3. 可能的风险提示
@@ -59,5 +60,6 @@ generate_advice_task:
     使用微信通知工具将这些建议发送给用户。
   goal: 生成详细的投资建议，并使用微信通知工具发送给用户。
   context:
+    - fetch_data_task  # 依赖于数据获取任务的输出
     - analyze_macd_task  # 依赖于MACD分析任务的输出
   expected_output: "微信通知已发送，包含针对{stock_ticker}的投资建议。"
