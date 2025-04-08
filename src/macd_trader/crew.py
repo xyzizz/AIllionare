@@ -10,7 +10,9 @@ from src.llm import LLM
 
 # from src.macd_trader.tools.trading_tools import TradingTools
 from src.macd_trader.tools.notification_tools import WechatNotificationTool
-from src.macd_trader.tools.stock_data_tools import StockDataTools
+
+# from src.macd_trader.tools.stock_data_tools import StockDataTools
+from src.macd_trader.tools.trading_tools import LBQuoteMACDTool
 
 # Assuming you might use Deepseek directly or another OpenAI-compatible API
 # You might need to adjust the base_url and api_key parameters
@@ -55,7 +57,7 @@ class TradingCrew:
     def data_fetcher(self) -> Agent:
         return Agent(
             config=self.agents_config["data_fetcher"],
-            tools=[StockDataTools()],
+            tools=[LBQuoteMACDTool()],
             llm=self.llm,  # Uncomment if you want to explicitly pass the LLM
             verbose=True,
         )

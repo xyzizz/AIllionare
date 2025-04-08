@@ -39,7 +39,7 @@ def run():
     """Initializes and runs the Trading Crew."""
     env_check()
     # Get inputs from environment variables or provide defaults
-    stock_ticker = os.getenv("TARGET_STOCK", "NVDA")  # Default to AAPL if not set
+    stock_ticker = os.getenv("TARGET_STOCK", "NVDA.US")  # Default to AAPL if not set
     trade_quantity = int(os.getenv("TRADE_QUANTITY", "1"))  # Default to 10 if not set
 
     inputs = {"stock_ticker": stock_ticker, "quantity": trade_quantity}
