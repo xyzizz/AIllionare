@@ -1,0 +1,63 @@
+fetch_data_task:
+  description: >
+    Fetch the latest stock data for {stock_ticker} using yfinance.
+    Calculate the Moving Average Convergence Divergence (MACD) indicator using the TA library.
+    Focus on the most recent data points to ensure timely analysis.
+    Expected output: A data structure (e.g., dictionary or pandas Series) containing the latest timestamp, closing price, MACD value, and MACD signal line value.
+  goal: Get the latest MACD data for {stock_ticker}.
+  expected_output: A dictionary containing the latest timestamp, closing price, MACD value, and MACD signal line value.
+  # agent: data_fetcher
+
+analyze_macd_task:
+  description: >
+    Analyze the MACD data provided for {stock_ticker}.
+    Determine if a bullish (MACD line crosses above signal line) or bearish (MACD line crosses below signal line) crossover has just occurred.
+    Based on the crossover detection, decide the trading action: BUY for bullish, SELL for bearish, HOLD otherwise.
+    Pass the decision (BUY, SELL, or HOLD) and the relevant MACD data to the next step.
+    Expected output: A string indicating the trading decision ('BUY', 'SELL', or 'HOLD').
+  goal: Analyze the MACD data for {stock_ticker} and decide whether to generate a buy or sell signal based on predefined MACD crossover rules.
+  expected_output: A string indicating the trading decision ('BUY', 'SELL', or 'HOLD').
+  # agent: trading_strategist
+  context:
+    - fetch_data_task # Depends on the output of the data fetching task
+
+# execute_trade_task:
+#   description: >
+#     Receive the trading decision for {stock_ticker} from the Trading Strategist.
+#     If the decision is BUY, execute a market buy order for {quantity} shares using the 'execute_buy_order' tool.
+#     If the decision is SELL, execute a market sell order for {quantity} shares using the 'execute_sell_order' tool.
+#     If the decision is HOLD, do nothing.
+#     Log the action taken (or lack thereof).
+#     Expected output: A confirmation message indicating whether an order was placed (e.g., "BUY order for 10 AAPL placed successfully", "SELL order for 10 AAPL placed", "HOLD decision, no trade executed").
+#   agent: trader
+#   context:
+#     - analyze_macd_task # Depends on the output of the analysis task
+
+# send_notification_task:
+#   description: >
+#     Receive the outcome of the trade execution for {stock_ticker}.
+#     If a trade was executed, formulate a notification message summarizing the action (e.g., "Successfully bought 10 shares of AAPL.", "Successfully sold 10 shares of AAPL.").
+#     Send this notification message via both Email using 'send_email_notification' and WeChat using 'send_wechat_notification'.
+#     If no trade was executed, no notification needs to be sent.
+#     Expected output: Confirmation that notifications were sent (e.g., "Email and WeChat notifications sent.") or a message indicating no trade occurred ("No trade executed, no notifications sent.").
+#   goal: Send a notification summarizing the trade execution for {stock_ticker}.
+#   expected_output: Confirmation that notifications were sent (e.g., "Email and WeChat notifications sent.") or a message indicating no trade occurred ("No trade executed, no notifications sent.").
+#   # agent: notifier
+#   context:
+#     - analyze_macd_task # Depends on the output of the trading task 
+
+
+generate_advice_task:
+  description: >
+    接收关于{stock_ticker}的MACD分析结果（BUY、SELL或HOLD信号）。
+    基于分析结果，生成详细的投资建议，包括：
+    1. 当前的市场信号解释（为什么是买入/卖出/持有）
+    2. 具体的操作建议（例如："建议以当前价格买入{quantity}股"）
+    3. 可能的风险提示
+    4. 后续关注点
+    使用微信通知工具将这些建议发送给用户。
+    Expected output: 一个字符串，确认微信通知已发送并包含发送的建议内容摘要。
+  agent: investment_advisor
+  context:
+    - analyze_macd_task  # 依赖于MACD分析任务的输出
+  expected_output: "微信通知已发送，包含针对{stock_ticker}的投资建议。"

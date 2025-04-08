@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "aillionare"
+version = "0.1.0"
+description = "AI-powered trading agent system"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+crewai = "^0.28.8" # Use the latest stable version
+crewai-tools = "^0.1.6"
+yfinance = "^0.2.37"
+ta = "^0.11.0"
+deepseek = "^0.2.2" # Assuming this is the correct package name
+python-dotenv = "^1.0.1"
+# Add the Longbridge SDK package name here when you know it
+# longbridge-sdk = "^x.y.z"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = ["E", "F", "B", "I", "UP", "N", "PL", "RUF"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["macd_trader"] 

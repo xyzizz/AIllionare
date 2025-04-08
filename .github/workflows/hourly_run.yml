@@ -1,0 +1,34 @@
+name: Hourly Script Execution
+
+on:
+  schedule:
+    # Run every hour from 8:00 UTC to 0:00 UTC (16:00-08:00 Beijing time)
+    - cron: '0 8-23 * * *' # 8:00-23:00 UTC
+    - cron: '0 0 * * *'    # 0:00 UTC (next day)
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          
+      - name: Run script
+        run: python main.py
+        env:
+          # Add your environment variables here
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          TARGET_STOCK: ${{ secrets.TARGET_STOCK }}
+          TRADE_QUANTITY: ${{ secrets.TRADE_QUANTITY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          # Add any other environment variables your script needs 
