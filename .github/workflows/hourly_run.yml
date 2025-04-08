@@ -5,7 +5,7 @@ on:
     # Run every hour during US market hours (including pre-market and after-hours)
     # US market total hours: 4:00 AM - 8:00 PM ET
     # Converting to UTC (covering both standard and daylight saving time periods)
-    - cron: "0 16-23 * * 1-5"
+    - cron: "0 11-15 * * 1-5"
   push:
     branches:
       - master
