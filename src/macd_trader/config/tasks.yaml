@@ -50,14 +50,14 @@ analyze_macd_task:
 generate_advice_task:
   description: >
     接收关于{stock_ticker}的MACD分析结果（BUY、SELL或HOLD信号）。
-    基于分析结果，生成详细的投资建议，包括：
-    1. 当前的市场信号解释（为什么是买入/卖出/持有）
-    2. 具体的操作建议（例如："建议以当前价格买入{quantity}股"）
-    3. 可能的风险提示
-    4. 后续关注点
+    标题为：{stock_ticker} [买入/卖出/持有]
+    内容为：
+      1. 当前的市场信号解释（为什么是买入/卖出/持有）
+      2. 具体的操作建议（例如："建议以当前价格买入{quantity}股"）
+      3. 可能的风险提示
+      4. 后续关注点
     使用微信通知工具将这些建议发送给用户。
-    Expected output: 一个字符串，确认微信通知已发送并包含发送的建议内容摘要。
-  agent: investment_advisor
+  goal: 生成详细的投资建议，并使用微信通知工具发送给用户。
   context:
     - analyze_macd_task  # 依赖于MACD分析任务的输出
   expected_output: "微信通知已发送，包含针对{stock_ticker}的投资建议。"
