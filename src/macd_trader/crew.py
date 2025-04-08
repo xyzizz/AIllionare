@@ -27,7 +27,7 @@ from src.macd_trader.tools.stock_data_tools import StockDataTools
 
 # Fallback: Using a standard OpenAI compatible model for structure
 # Replace this with your actual Deepseek LLM setup
-deepseek_llm = LLM.deepseek()
+# deepseek_llm = LLM.deepseek()
 
 
 # Import your custom tools
@@ -35,7 +35,7 @@ deepseek_llm = LLM.deepseek()
 
 # Instantiate tools
 # trading_tool = TradingTools()
-notification_tool = WechatNotificationTool()
+# notification_tool = WechatNotificationTool()
 
 
 @CrewBase
@@ -47,10 +47,9 @@ class TradingCrew:
 
     def __init__(self) -> None:
         # If using a non-OpenAI model compatible with Langchain ChatModel interface:
-        self.llm = deepseek_llm  # Use the llm defined above
+        self.llm = LLM.deepseek()  # Use the llm defined above
         # If the Deepseek model requires direct SDK use within agents/tools,
         # you might not define a global LLM here, or pass it differently.
-        pass  # Keep this simple for now, assuming default LLM setup works or is handled in agents.yaml
 
     @agent
     def data_fetcher(self) -> Agent:
@@ -67,6 +66,15 @@ class TradingCrew:
             config=self.agents_config["trading_strategist"],
             # No specific tools needed here as logic is in the task description
             llm=self.llm,
+            verbose=True,
+        )
+
+    @agent
+    def investment_advisor(self) -> Agent:
+        return Agent(
+            config=self.agents_config["investment_advisor"],
+            llm=self.llm,
+            tools=[WechatNotificationTool()],
             verbose=True,
         )
 
@@ -128,15 +136,6 @@ class TradingCrew:
     #         context=[self.analyze_macd_task()],  # Pass trade execution result
     #     )
 
-    @agent
-    def investment_advisor(self) -> Agent:
-        return Agent(
-            config=self.agents_config["investment_advisor"],
-            llm=self.llm,
-            tools=[WechatNotificationTool()],
-            verbose=True,
-        )
-
     @task
     def generate_advice_task(self) -> Task:
         return Task(
@@ -149,9 +148,9 @@ class TradingCrew:
     def crew(self) -> Crew:
         """Creates the Trading Crew."""
         return Crew(
-            manager_llm=deepseek_llm,
-            function_calling_llm=deepseek_llm,
-            chat_llm=deepseek_llm,
+            manager_llm=self.llm,
+            function_calling_llm=self.llm,
+            chat_llm=self.llm,
             agents=[
                 self.data_fetcher(),
                 self.trading_strategist(),

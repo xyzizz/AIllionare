@@ -24,8 +24,8 @@ def env_check():
     env_vars = [
         "PUSHPLUS_TOKEN",
         "DEEPSEEK_API_KEY",
-        # "TRADE_QUANTITY",
-        # "TARGET_STOCK",
+        "TRADE_QUANTITY",
+        "TARGET_STOCK",
         # "LONGBRIDGE_API_KEY",
         # "LONGBRIDGE_API_SECRET",
         # "LONGBRIDGE_ACCESS_TOKEN",
@@ -40,11 +40,13 @@ def run():
     """Initializes and runs the Trading Crew."""
     # Get inputs from environment variables or provide defaults
     stock_ticker = os.getenv("TARGET_STOCK", "NVDA")  # Default to AAPL if not set
-    # trade_quantity = int(os.getenv("TRADE_QUANTITY", 1))  # Default to 10 if not set
+    trade_quantity = int(os.getenv("TRADE_QUANTITY", "1"))  # Default to 10 if not set
 
-    inputs = {"stock_ticker": stock_ticker}
+    inputs = {"stock_ticker": stock_ticker, "quantity": trade_quantity}
 
-    logger.info(f"Starting trading crew for {stock_ticker}")
+    logger.info(
+        f"Starting trading crew for {stock_ticker} with quantity {trade_quantity}"
+    )
 
     try:
         # Initialize the crew
