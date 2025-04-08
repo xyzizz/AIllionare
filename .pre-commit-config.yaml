@@ -5,3 +5,13 @@ repos:
       - id: ruff
         args: [--fix, --ignore=E501]
       - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: pipreqs
+        name: pipreqs
+        description: Generate a requirements.txt file based on imports
+        entry: bash -c 'pipreqs --force .'
+        language: system
+        pass_filenames: false
+        types: [python]
