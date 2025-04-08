@@ -5,7 +5,10 @@ on:
     # Run every hour from 8:00 UTC to 0:00 UTC (16:00-08:00 Beijing time)
     - cron: '0 8-23 * * *' # 8:00-23:00 UTC
     - cron: '0 0 * * *'    # 0:00 UTC (next day)
-
+  push:
+    branches:
+      - master
+      - dev
 jobs:
   run-script:
     runs-on: ubuntu-latest
