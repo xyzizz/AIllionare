@@ -14,6 +14,7 @@ class LLM:
             model="openai/deepseek-chat",
             base_url="https://api.deepseek.com/v1/",
             api_key=os.getenv("DEEPSEEK_API_KEY"),
+            temperature=0,
         )
         return deepseek_llm
 

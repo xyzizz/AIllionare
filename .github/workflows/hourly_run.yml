@@ -2,9 +2,6 @@ name: Hourly Script Execution
 
 on:
   schedule:
-    # Run every hour during US market hours (including pre-market and after-hours)
-    # US market total hours: 4:00 AM - 8:00 PM ET
-    # Converting to UTC (covering both standard and daylight saving time periods)
     - cron: "0 11-15 * * 1-5"
   push:
     branches:
@@ -30,9 +27,7 @@ jobs:
       - name: Run script
         run: python main.py
         env:
-          # Add your environment variables here
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
           TARGET_STOCK: ${{ secrets.TARGET_STOCK }}
           TRADE_QUANTITY: ${{ secrets.TRADE_QUANTITY }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          # Add any other environment variables your script needs

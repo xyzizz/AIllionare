@@ -1,18 +1,9 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
-# It seems deepseek might not have a direct LangChain integration readily available
-# like OpenAI, Anthropic, etc. You might need to use their API directly or find/
-# create a custom LangChain wrapper if you want strict LangChain compatibility.
-# For now, let's structure it assuming a compatible LLM or adapting later.
-# If using Deepseek's SDK directly, the agent LLM configuration would differ.
 from src.llm import LLM
-
-# from src.macd_trader.tools.trading_tools import TradingTools
 from src.macd_trader.tools.notification_tools import WechatNotificationTool
-
-# from src.macd_trader.tools.stock_data_tools import StockDataTools
-from src.macd_trader.tools.trading_tools import LBQuoteMACDTool
+from src.macd_trader.tools.stock_data_tools import StockDataTools
 
 # Assuming you might use Deepseek directly or another OpenAI-compatible API
 # You might need to adjust the base_url and api_key parameters
@@ -36,8 +27,9 @@ from src.macd_trader.tools.trading_tools import LBQuoteMACDTool
 
 
 # Instantiate tools
+notification_tool = WechatNotificationTool()
+data_fetcher_tool = StockDataTools()
 # trading_tool = TradingTools()
-# notification_tool = WechatNotificationTool()
 
 
 @CrewBase
@@ -57,7 +49,7 @@ class TradingCrew:
     def data_fetcher(self) -> Agent:
         return Agent(
             config=self.agents_config["data_fetcher"],
-            tools=[LBQuoteMACDTool()],
+            tools=[data_fetcher_tool],
             llm=self.llm,  # Uncomment if you want to explicitly pass the LLM
             verbose=True,
         )
@@ -76,7 +68,7 @@ class TradingCrew:
         return Agent(
             config=self.agents_config["investment_advisor"],
             llm=self.llm,
-            tools=[WechatNotificationTool()],
+            tools=[notification_tool],
             verbose=True,
         )
 

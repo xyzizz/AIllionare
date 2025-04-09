@@ -1,4 +1,5 @@
 import logging
+from pprint import pp
 
 import pandas as pd
 import yfinance as yf
@@ -6,19 +7,20 @@ from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 from ta.trend import MACD
 
-
-class StockDataToolsInput(BaseModel):
-    ticker: str = Field(..., description="The stock ticker to fetch data for.")
-    mode: str = Field(
-        default="macd",
-        description="The mode to fetch data for. 'macd' for MACD, 'price' for stock price.",
-    )
-
-
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
+
+
+class StockDataToolsInput(BaseModel):
+    ticker: str = Field(
+        ..., description="The stock ticker to fetch data for. e.g. AAPL"
+    )
+    mode: str = Field(
+        default="macd",
+        description="The mode to fetch data for. 'macd' for MACD, 'price' for stock price.",
+    )
 
 
 class StockDataTools(BaseTool):
@@ -119,13 +121,17 @@ class StockDataTools(BaseTool):
                 f"MACD for {ticker} ({latest_timestamp}): MACD={macd_value:.2f}, Signal={signal_value:.2f}, Hist={hist_value:.2f}"
             )
             # Return a structured string or dictionary string representation
-            return (
+            print(
                 f"Latest MACD data for {ticker} ({latest_timestamp}):\n"
                 f"  Close Price: ${latest_data['Close']:.2f}\n"
                 f"  MACD Line: {macd_value:.4f}\n"
                 f"  Signal Line: {signal_value:.4f}\n"
                 f"  MACD Histogram: {hist_value:.4f}"
             )
+
+            hist_list = hist.to_dict(orient="records")
+            pp(hist_list)
+            return hist_list
 
         except Exception as e:
             logging.error(f"Error calculating MACD for {ticker}: {e}")
