@@ -1,5 +1,4 @@
 import logging
-from pprint import pp
 
 import pandas as pd
 import yfinance as yf
@@ -101,6 +100,7 @@ class StockDataTools(BaseTool):
             hist["MACD"] = macd.macd()
             hist["MACD_Signal"] = macd.macd_signal()
             hist["MACD_Hist"] = macd.macd_diff()  # Histogram
+            hist["Date"] = hist.index.strftime("%Y-%m-%d %H:%M:%S")  # Add date column
 
             # Get the latest values
             latest_data = hist.iloc[-1]
@@ -130,7 +130,7 @@ class StockDataTools(BaseTool):
             )
 
             hist_list = hist.to_dict(orient="records")
-            pp(hist_list)
+            # pp(hist_list)
             return hist_list
 
         except Exception as e:

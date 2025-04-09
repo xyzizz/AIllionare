@@ -20,24 +20,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def env_check():
-    env_vars = [
-        "PUSHPLUS_TOKEN",
-        "DEEPSEEK_API_KEY",
-        "TRADE_QUANTITY",
-        "TARGET_STOCK",
-        # "LONGBRIDGE_API_KEY",
-        # "LONGBRIDGE_API_SECRET",
-        # "LONGBRIDGE_ACCESS_TOKEN",
-    ]
-    for env_var in env_vars:
-        if not os.getenv(env_var):
-            raise ValueError(f"{env_var} is not set in the environment variables.")
-
-
 def run():
     """Initializes and runs the Trading Crew."""
-    env_check()
     # Get inputs from environment variables or provide defaults
     stock_ticker = os.getenv("TARGET_STOCK", "NVDA.US")  # Default to AAPL if not set
     trade_quantity = int(os.getenv("TRADE_QUANTITY", "1"))  # Default to 10 if not set

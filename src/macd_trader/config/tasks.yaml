@@ -10,12 +10,12 @@ fetch_data_task:
 analyze_macd_task:
   description: >
     分析提供的{stock_ticker}的MACD数据。
-    确定是否刚刚发生了看涨交叉（MACD线上穿信号线）或看跌交叉（MACD线下穿信号线）。
-    根据交叉检测结果，决定交易行动：看涨时买入，看跌时卖出，否则持有。
-    将决定（买入、卖出或持有）和相关的MACD数据传递到下一步。
+    确定是否刚刚发生了看涨交叉（MACD线上穿信号线）或看跌交叉（MACD线下穿信号线），并预测走势。
+    根据分析结果，决定交易行动：看涨时买入，看跌时卖出，否则持有。
+    将最新股价、决定（买入、卖出或持有）的理由、和相关的MACD数据传递到下一步。
     预期输出：表示交易决定的字符串（'BUY'、'SELL'或'HOLD'）。
   goal: 分析{stock_ticker}的MACD数据，并根据预定义的MACD交叉规则决定是否生成买入或卖出信号。
-  expected_output: 表示交易决定的字符串（'BUY'、'SELL'或'HOLD'），以及做出该决定的原因。
+  expected_output: 最新的股价、表示交易决定的字符串（'BUY'、'SELL'或'HOLD'）、以及做出该决定的原因。
   context:
     - fetch_data_task # 依赖于数据获取任务的输出
 
@@ -33,9 +33,9 @@ analyze_macd_task:
 generate_advice_task:
   description: >
     接收关于{stock_ticker}的股价信息和MACD分析结果（BUY、SELL或HOLD信号）。
-    标题为：{stock_ticker} [买入/卖出/持有], 例如："AAPL [买入]"。
+    标题为：{stock_ticker} [买入/卖出/持有], 例如："股票名称 [买入]"。
     内容为：
-      1. 当前时间、股价、MACD值
+      1. 最新的股价、MACD信息
       2. 当前的市场信号解释（为什么是买入/卖出/持有）
       3. 具体的操作建议（例如："建议以当前价格买入{quantity}股"）
       4. 可能的风险提示
