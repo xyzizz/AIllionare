@@ -1,10 +1,10 @@
 import logging
 
 import pandas as pd
-import ta
 import yfinance as yf
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
+from ta.trend import MACD
 
 
 class StockDataToolsInput(BaseModel):
@@ -95,7 +95,7 @@ class StockDataTools(BaseTool):
 
         try:
             # Calculate MACD
-            macd = ta.trend.MACD(hist["Close"])
+            macd = MACD(hist["Close"])
             hist["MACD"] = macd.macd()
             hist["MACD_Signal"] = macd.macd_signal()
             hist["MACD_Hist"] = macd.macd_diff()  # Histogram
