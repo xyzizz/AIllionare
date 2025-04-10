@@ -20,7 +20,24 @@ analyze_macd_task:
   context:
     - fetch_data_task # 依赖于数据获取任务的输出
 
-# execute_trade_task:
+generate_advice_task:
+  description: >
+    任务描述：
+    1. 整合{stock_ticker}的实时股价数据和MACD技术分析结果（包括买入/卖出/持有信号）
+    2. 生成投资建议报告，标题格式为："{stock_ticker} [信号]"，例如："股票名称 [买入]"
+    3. 报告内容应包含以下关键部分：
+       a. 最新市场数据：当前股价和关键MACD指标值
+       b. 市场信号分析：详细解释为何推荐买入/卖出/持有的技术依据
+       c. 风险评估：可能面临的市场风险和不确定因素
+       d. 后续观察重点：未来需要密切关注的价格区间或技术指标变化
+    4. 通过微信通知工具将完整投资建议推送给用户
+  goal: 生成详细的中文投资建议，并使用微信通知工具发送给用户。
+  context:
+    - fetch_data_task # 依赖于数据获取任务的输出
+    - analyze_macd_task # 依赖于MACD分析任务的输出
+  expected_output: "微信通知已发送，包含针对{stock_ticker}的投资建议。"
+
+  # execute_trade_task:
 #   description: >
 #     任务描述：
 #     1. 接收来自分析模块关于{stock_ticker}的交易决策信号
@@ -32,21 +49,3 @@ analyze_macd_task:
 #     4. 生成交易执行报告，确认订单状态和执行结果
 #   context:
 #     - analyze_macd_task # 依赖于分析任务的输出
-
-generate_advice_task:
-  description: >
-    任务描述：
-    1. 整合{stock_ticker}的实时股价数据和MACD技术分析结果（包括买入/卖出/持有信号）
-    2. 生成投资建议报告，标题格式为："{stock_ticker} [投资建议]"，例如："股票名称 [买入]"
-    3. 报告内容应包含以下关键部分：
-       a. 最新市场数据：当前股价和关键MACD指标值
-       b. 市场信号分析：详细解释为何推荐买入/卖出/持有的技术依据
-       c. 具体操作建议：明确的交易数量和价格指导，如"建议以当前价格买入{quantity}股"
-       d. 风险评估：可能面临的市场风险和不确定因素
-       e. 后续观察重点：未来需要密切关注的价格区间或技术指标变化
-    4. 通过微信通知工具将完整投资建议推送给用户
-  goal: 生成详细的投资建议，并使用微信通知工具发送给用户。
-  context:
-    - fetch_data_task  # 依赖于数据获取任务的输出
-    - analyze_macd_task  # 依赖于MACD分析任务的输出
-  expected_output: "微信通知已发送，包含针对{stock_ticker}的投资建议。"

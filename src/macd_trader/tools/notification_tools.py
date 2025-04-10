@@ -5,7 +5,6 @@ import requests
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )

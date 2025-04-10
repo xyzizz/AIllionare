@@ -6,7 +6,6 @@ from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 from ta.trend import MACD
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -14,34 +13,42 @@ logging.basicConfig(
 
 class StockDataToolsInput(BaseModel):
     ticker: str = Field(
-        ..., description="The stock ticker to fetch data for. e.g. AAPL"
+        ..., description="The stock ticker symbol to analyze (e.g., AAPL, MSFT)"
     )
     mode: str = Field(
         default="macd",
-        description="The mode to fetch data for. 'macd' for MACD, 'price' for stock price.",
+        description="Analysis mode: 'macd' for MACD indicator calculation",
     )
 
 
-class StockDataTools(BaseTool):
-    name: str = "Stock Data Tools"
-    description: str = (
-        "Tools for fetching stock prices and calculating MACD technical indicator."
-    )
+class YFinanceMACDTool(BaseTool):
+    name: str = "YFinance MACD Tool"
+    description: str = "Tools for fetching historical stock data and analyzing MACD technical indicators."
     args_schema: type[BaseModel] = StockDataToolsInput
 
     def _fetch_data(
         self, stock_ticker: str, period: str = "3mo", interval: str = "1d"
     ) -> pd.DataFrame:
-        """Fetches historical stock data."""
+        """
+        Retrieves historical stock data from Yahoo Finance API.
+
+        Args:
+            stock_ticker: Stock symbol to fetch data for
+            period: Historical data timeframe (default: 3 months)
+            interval: Data aggregation interval (default: daily)
+
+        Returns:
+            DataFrame containing historical price data or empty DataFrame on failure
+        """
         stock = yf.Ticker(stock_ticker)
         try:
-            # Fetch data for a slightly longer period initially to ensure enough data for MACD
+            # Fetch initial data with requested parameters
             hist = stock.history(period=period, interval=interval)
             if hist.empty:
                 logging.warning(
                     f"No history found for {stock_ticker} with period={period}, interval={interval}"
                 )
-                # Try fetching with a default period if the initial fetch fails
+                # Fall back to longer timeframe if initial request returns no data
                 hist = stock.history(period="1y", interval="1d")
                 if hist.empty:
                     logging.error(
@@ -54,10 +61,9 @@ class StockDataTools(BaseTool):
             return pd.DataFrame()
 
     def get_stock_price(self, ticker: str) -> str:
-        """Fetches the latest closing stock price for a given ticker."""
         try:
             stock = yf.Ticker(ticker)
-            # Get data for the last few days to ensure we get the most recent closing price
+            # Get recent historical data for closing price
             hist = stock.history(period="5d", interval="1d")
             if not hist.empty:
                 latest_price = hist["Close"].iloc[-1]
@@ -67,7 +73,7 @@ class StockDataTools(BaseTool):
                 )
                 return f"The latest closing price for {ticker} is ${latest_price:.2f} as of {latest_timestamp}."
             else:
-                # Fallback for potentially delisted or problematic tickers
+                # Alternative price sources if historical data unavailable
                 info = stock.info
                 current_price = (
                     info.get("currentPrice")
@@ -89,20 +95,31 @@ class StockDataTools(BaseTool):
             return f"Error fetching stock price for {ticker}: {e}"
 
     def get_macd(self, ticker: str) -> str:
-        """Calculates the MACD indicator for a given stock ticker and returns the latest values."""
+        """
+        Calculates and returns MACD technical indicator data for a stock.
+
+        Computes the MACD line, signal line, and histogram values using
+        the TA library with default parameters (12,26,9).
+
+        Args:
+            ticker: Stock symbol to calculate MACD for
+
+        Returns:
+            List of dictionaries containing historical MACD data and price information
+        """
         hist = self._fetch_data(ticker)
         if hist.empty:
             return f"Could not calculate MACD for {ticker} due to data fetching issues."
 
         try:
-            # Calculate MACD
+            # Calculate MACD indicators using technical analysis library
             macd = MACD(hist["Close"])
             hist["MACD"] = macd.macd()
             hist["MACD_Signal"] = macd.macd_signal()
             hist["MACD_Hist"] = macd.macd_diff()  # Histogram
             hist["Date"] = hist.index.strftime("%Y-%m-%d %H:%M:%S")  # Add date column
 
-            # Get the latest values
+            # Extract latest indicator values for logging
             latest_data = hist.iloc[-1]
             latest_timestamp = hist.index[-1].strftime("%Y-%m-%d")
             macd_value = latest_data["MACD"]
@@ -120,8 +137,8 @@ class StockDataTools(BaseTool):
             logging.info(
                 f"MACD for {ticker} ({latest_timestamp}): MACD={macd_value:.2f}, Signal={signal_value:.2f}, Hist={hist_value:.2f}"
             )
-            # Return a structured string or dictionary string representation
-            print(
+            # Log detailed information for debugging
+            latest_info = (
                 f"Latest MACD data for {ticker} ({latest_timestamp}):\n"
                 f"  Close Price: ${latest_data['Close']:.2f}\n"
                 f"  MACD Line: {macd_value:.4f}\n"
@@ -129,19 +146,13 @@ class StockDataTools(BaseTool):
                 f"  MACD Histogram: {hist_value:.4f}"
             )
 
+            # Convert DataFrame to list of dictionaries for return
             hist_list = hist.to_dict(orient="records")
-            # pp(hist_list)
-            return hist_list
+            return hist_list, latest_info
 
         except Exception as e:
             logging.error(f"Error calculating MACD for {ticker}: {e}")
             return f"Error calculating MACD for {ticker}: {e}"
 
     def _run(self, ticker: str, mode: str = "macd") -> str:
-        """
-        Runs the specified tool function (get_macd).
-        """
-        # if mode == "macd":
         return self.get_macd(ticker)
-        # elif mode == "price":
-        #     return self.get_stock_price(ticker)
