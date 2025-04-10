@@ -1,6 +1,5 @@
 import datetime
 import logging
-from pprint import pp
 
 import pandas as pd
 from crewai.tools import BaseTool
@@ -101,8 +100,8 @@ class LBQuoteHistoryInput(BaseModel):
 
 
 class LBQuoteMACDTool(BaseTool):
-    name: str = "LBQuoteHistoryTool"
-    description: str = "Fetches historical stock data for a given ticker symbol."
+    name: str = "LBQuoteMACDTool"
+    description: str = "获取股票历史数据并计算MACD技术指标，用于分析股票走势。"
     args_schema: type[BaseModel] = LBQuoteHistoryInput
 
     def get_history(self, ticker: str, start, end) -> pd.DataFrame:
@@ -125,7 +124,7 @@ class LBQuoteMACDTool(BaseTool):
         print(df)
         return df
 
-    def get_macd(self, ticker: str) -> list[dict]:
+    def get_macd(self, ticker: str) -> tuple[list[dict], str]:
         """Calculates the MACD indicator for a given stock ticker and returns the latest values."""
         hist = self.get_history(
             ticker,
@@ -160,21 +159,17 @@ class LBQuoteMACDTool(BaseTool):
             logging.info(
                 f"MACD for {ticker} ({latest_timestamp}): MACD={macd_value:.2f}, Signal={signal_value:.2f}, Hist={hist_value:.2f}"
             )
-            # pd to list[dict]
+
             hist["timestamp"] = hist.index
             hist_list = hist.to_dict(orient="records")
-            # paint
-
-            pp(hist_list)
-            return hist_list
-            # Return macd values list
-            # return (
-            #     f"Latest MACD data for {ticker} ({latest_timestamp}):\n"
-            #     f"  Close Price: ${latest_data['Close']:.2f}\n"
-            #     f"  MACD Line: {macd_value:.4f}\n"
-            #     f"  Signal Line: {signal_value:.4f}\n"
-            #     f"  MACD Histogram: {hist_value:.4f}"
-            # )
+            lateset_info = (
+                f"Latest MACD data for {ticker} ({latest_timestamp}):\n"
+                f"  Close Price: ${latest_data['Close']:.2f}\n"
+                f"  MACD Line: {macd_value:.4f}\n"
+                f"  Signal Line: {signal_value:.4f}\n"
+                f"  MACD Histogram: {hist_value:.4f}"
+            )
+            return hist_list, lateset_info
 
         except Exception as e:
             logging.error(f"Error calculating MACD for {ticker}: {e}")
