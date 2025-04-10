@@ -4,7 +4,7 @@ from crewai.project import CrewBase, agent, crew, task
 from src.llm import LLM
 from src.macd_trader.tools.notification_tools import WechatNotificationTool
 from src.macd_trader.tools.stock_data_tools import StockDataTools
-
+from src.macd_trader.tools.trading_tools import LBQuoteMACDTool
 # Assuming you might use Deepseek directly or another OpenAI-compatible API
 # You might need to adjust the base_url and api_key parameters
 # Example for OpenAI compatible endpoint (like local LLM server or other providers)
@@ -28,8 +28,8 @@ from src.macd_trader.tools.stock_data_tools import StockDataTools
 
 # Instantiate tools
 notification_tool = WechatNotificationTool()
-data_fetcher_tool = StockDataTools()
-# trading_tool = TradingTools()
+yf_fetcher_tool = StockDataTools()
+lb_fetcher_tool = LBQuoteMACDTool()
 
 
 @CrewBase
@@ -49,7 +49,7 @@ class TradingCrew:
     def data_fetcher(self) -> Agent:
         return Agent(
             config=self.agents_config["data_fetcher"],
-            tools=[data_fetcher_tool],
+            tools=[lb_fetcher_tool],
             llm=self.llm,  # Uncomment if you want to explicitly pass the LLM
             verbose=True,
         )
