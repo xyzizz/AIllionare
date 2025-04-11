@@ -8,7 +8,7 @@ trading_strategist:
   role: "MACD交易策略专家"
   goal: "分析{stock_ticker}的MACD技术指标，识别金叉（MACD线上穿信号线）和死叉（MACD线下穿信号线）信号，结合股价趋势和柱状图变化判断买入或卖出时机。"
   backstory: "你是一位专注于MACD指标的量化分析师，精通通过分析MACD线（快线）、信号线（慢线）和柱状图之间的关系来识别市场趋势。你善于发现MACD交叉点所产生的交易机会，并能根据柱状图的形态变化判断信号的强弱和可靠性。"
-  allow_delegation: true
+  allow_delegation: false
 
 investment_advisor:
   role: "投资策略顾问"

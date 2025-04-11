@@ -98,7 +98,7 @@ class LongBridgeMACDTool(BaseTool):
             logging.error(f"Error calculating MACD for {ticker}: {e}")
             return f"Error calculating MACD for {ticker}: {e}"
 
-    def _run(self, ticker: str, mode: str = "macd") -> str:
+    def _run(self, ticker: str, mode: str = "macd") -> tuple[list[dict], str]:
         """
         Runs the specified tool function (get_macd).
         """

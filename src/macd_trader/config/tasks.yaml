@@ -6,7 +6,7 @@ fetch_data_task:
     3. 将获取的数据整理成标准格式，包含最新交易时间、收盘价、MACD值及信号线数值
     4. 返回包含最新时间戳、收盘价、MACD值和MACD信号线值的列表
   goal: 获取{stock_ticker}的最新MACD数据。
-  expected_output: 包含最新时间戳、收盘价、MACD值和MACD信号线值的列表。
+  expected_output: 有效的分日数据列表，包含日期、收盘价、MACD线值、信号线和MACD柱状图值。
 
 analyze_macd_task:
   description: >
@@ -24,7 +24,7 @@ generate_advice_task:
   description: >
     任务描述：
     1. 整合{stock_ticker}的实时股价数据和MACD技术分析结果（包括买入/卖出/持有信号）
-    2. 生成投资建议报告，标题格式为："{stock_ticker} [信号]"，例如："股票名称 [买入]"
+    2. 生成中文投资建议报告，标题格式为："{stock_ticker} [信号]"，例如："股票名称 [买入]"
     3. 报告内容应包含以下关键部分：
        a. 最新市场数据：当前股价和关键MACD指标值
        b. 市场信号分析：详细解释为何推荐买入/卖出/持有的技术依据
