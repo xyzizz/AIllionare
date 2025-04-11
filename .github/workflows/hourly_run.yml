@@ -2,11 +2,11 @@ name: Hourly Script Execution
 
 on:
   schedule:
-    - cron: "0 0,12,14 * * 1-5"
+    - cron: "0 * * * 1-5"
   push:
     branches:
       - master
-      - dev
+      # - dev
 jobs:
   run-script:
     runs-on: ubuntu-latest
