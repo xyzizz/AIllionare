@@ -41,7 +41,15 @@ class TradingCrew:
         return Agent(
             config=self.agents_config["investment_advisor"],
             llm=llm,
+            verbose=True,
+        )
+
+    @agent
+    def notification_manager(self) -> Agent:
+        return Agent(
+            config=self.agents_config["notification_manager"],
             tools=[notification_tool],
+            llm=llm,
             verbose=True,
         )
 
@@ -77,6 +85,14 @@ class TradingCrew:
             config=self.tasks_config["generate_advice_task"],
             agent=self.investment_advisor(),
             context=[self.analyze_macd_task()],
+        )
+
+    @task
+    def send_notification_task(self) -> Task:
+        return Task(
+            config=self.tasks_config["send_notification_task"],
+            agent=self.notification_manager(),
+            context=[self.generate_advice_task()],
         )
 
     # @task
