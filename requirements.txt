@@ -6,3 +6,7 @@ python-dotenv==1.1.0
 Requests==2.32.3
 ta==0.11.0
 yfinance==0.2.55
+matplotlib==3.8.2
+seaborn==0.12.2
+scipy==1.11.4
+numpy==1.24.3
