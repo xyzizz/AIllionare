@@ -2,7 +2,9 @@ name: Hourly Script Execution
 
 on:
   schedule:
-    - cron: "0 0,13 * * 1-5" # 
+    - cron: "0 0,13 * * 1-5" # 每天0点、13点执行
+
+  workflow_dispatch: # 手动触发
   push:
     branches:
       - master
