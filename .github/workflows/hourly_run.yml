@@ -22,23 +22,34 @@ jobs:
         with:
           python-version: "3.11.11"
 
-      - name: Cache pip dependencies
+      - name: Debug Python paths
+        run: |
+          echo "Python executable: $(which python)"
+          echo "Python version: $(python --version)"
+          echo "Python site-packages:"
+          python -c "import site; print(site.getsitepackages())"
+          echo "User site-packages:"
+          python -c "import site; print(site.getusersitepackages())"
+          echo "Pip cache dir:"
+          pip cache dir
+
+      - name: Cache pip dependencies (simplified)
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: pip-cache-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            pip-cache-
 
-      - name: Cache Python packages
+      - name: Cache Python packages (simplified)
         uses: actions/cache@v4
         with:
           path: |
+            /opt/hostedtoolcache/Python/3.11.11/x64/lib/python3.11/site-packages
             ~/.local/lib/python3.11/site-packages
-            ~/.local/bin
-          key: ${{ runner.os }}-python-packages-${{ hashFiles('**/requirements.txt') }}
+          key: python-packages-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-python-packages-
+            python-packages-
 
       - name: Install dependencies
         run: |
