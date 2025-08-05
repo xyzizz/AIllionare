@@ -46,7 +46,7 @@ jobs:
         with:
           path: |
             /opt/hostedtoolcache/Python/3.11.11/x64/lib/python3.11/site-packages
-            ~/.local/lib/python3.11/site-packages
+            /home/runner/.local/lib/python3.11/site-packages
           key: python-packages-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             python-packages-
