@@ -17,7 +17,7 @@ jobs:
       - name: Try to use Docker image
         id: try-docker
         run: |
-          if docker pull ghcr.io/${{ github.repository }}:master 2>/dev/null; then
+          if docker pull ghcr.io/${{ github.repository }}:latest 2>/dev/null; then
             echo "using_docker=true" >> $GITHUB_OUTPUT
             docker run --rm \
               -e PUSHPLUS_TOKEN="${{ secrets.PUSHPLUS_TOKEN }}" \
