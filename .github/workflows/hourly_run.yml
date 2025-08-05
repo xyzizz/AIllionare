@@ -1,4 +1,4 @@
-name: Hourly Script Execution
+name: AI Trading Bot - Scheduled Execution
 
 on:
   schedule:

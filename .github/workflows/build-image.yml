@@ -1,11 +1,12 @@
-name: Build and Push Docker Image
+name: Build AI Trading Bot Docker Image
 
 on:
   push:
     branches: [ master ]
-    paths:
-      - 'requirements.txt'
-      - 'Dockerfile'
+    # 移除paths限制，每次push都构建
+    # paths:
+    #   - 'requirements.txt'
+    #   - 'Dockerfile'
   workflow_dispatch:
 
 env:
