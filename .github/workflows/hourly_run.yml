@@ -5,10 +5,7 @@ on:
     - cron: "0 0,13 * * 1-5" # 每天0点、13点执行
 
   workflow_dispatch: # 手动触发
-  push:
-    branches:
-      - master
-      # - dev
+
 
 jobs:
   run-script:
@@ -17,49 +14,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Try to use Docker image
+        id: try-docker
+        run: |
+          if docker pull ghcr.io/${{ github.repository }}:master 2>/dev/null; then
+            echo "using_docker=true" >> $GITHUB_OUTPUT
+            docker run --rm \
+              -e PUSHPLUS_TOKEN="${{ secrets.PUSHPLUS_TOKEN }}" \
+              -e TARGET_STOCK="${{ secrets.TARGET_STOCK }}" \
+              -e TRADE_QUANTITY="${{ secrets.TRADE_QUANTITY }}" \
+              -e DEEPSEEK_API_KEY="${{ secrets.DEEPSEEK_API_KEY }}" \
+              -e LONGBRIDGE_APP_KEY="${{ secrets.LONGBRIDGE_APP_KEY }}" \
+              -e LONGBRIDGE_APP_SECRET="${{ secrets.LONGBRIDGE_APP_SECRET }}" \
+              -e LONGBRIDGE_ACCESS_TOKEN="${{ secrets.LONGBRIDGE_ACCESS_TOKEN }}" \
+              ghcr.io/${{ github.repository }}:master
+          else
+            echo "using_docker=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Python
+        if: steps.try-docker.outputs.using_docker != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.11.11"
 
-      - name: Debug Python paths
-        run: |
-          echo "Python executable: $(which python)"
-          echo "Python version: $(python --version)"
-          echo "Python site-packages:"
-          python -c "import site; print(site.getsitepackages())"
-          echo "User site-packages:"
-          python -c "import site; print(site.getusersitepackages())"
-          echo "Pip cache dir:"
-          pip cache dir
-
-      - name: Cache pip dependencies (simplified)
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: pip-cache-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            pip-cache-
-
-      - name: Cache Python packages (simplified)
-        uses: actions/cache@v4
-        with:
-          path: |
-            /opt/hostedtoolcache/Python/3.11.11/x64/lib/python3.11/site-packages
-            /home/runner/.local/lib/python3.11/site-packages
-          key: python-packages-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            python-packages-
-
-      - name: Install dependencies
+      - name: Install dependencies and run (fallback)
+        if: steps.try-docker.outputs.using_docker != 'true'
         run: |
           python -m pip install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple/
-          if [ -f requirements.txt ]; then 
-            pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --cache-dir ~/.cache/pip
-          fi
-
-      - name: Run script
-        run: python main.py
+          pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/
+          python main.py
         env:
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
           TARGET_STOCK: ${{ secrets.TARGET_STOCK }}
