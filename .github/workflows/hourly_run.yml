@@ -27,7 +27,7 @@ jobs:
               -e LONGBRIDGE_APP_KEY="${{ secrets.LONGBRIDGE_APP_KEY }}" \
               -e LONGBRIDGE_APP_SECRET="${{ secrets.LONGBRIDGE_APP_SECRET }}" \
               -e LONGBRIDGE_ACCESS_TOKEN="${{ secrets.LONGBRIDGE_ACCESS_TOKEN }}" \
-              ghcr.io/${{ github.repository }}:master
+              ghcr.io/${{ github.repository }}:latest
           else
             echo "using_docker=false" >> $GITHUB_OUTPUT
           fi
